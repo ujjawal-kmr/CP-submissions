@@ -1,78 +1,83 @@
-
-#include<bits/stdc++.h>
+/*Let's get high :D*/
+#include <bits/stdc++.h>
 using namespace std;
-
-#define watch(x) cout << #x << " = " << x << "\n"
-#define M 1000000007
-#define ins insert 
-#define pb push_back
-#define eb emplace_back
-#define endl "\n"
 typedef long long ll;
-typedef double db;
-typedef long double ld;
-typedef string str;
+ 
+#define MOD                 1000000007LL
+#define EPS                 1e-9
+#define io                  ios_base::sync_with_stdio(false);cin.tie(NULL);
+#define M_PI                3.14159265358979323846
 
+template <typename T> T gcd(T a, T b){return (b==0)?a:gcd(b,a%b);}
+template <typename T> T lcm(T a, T b){return a*(b/gcd(a,b));}
+template <typename T> T mod_exp(T b, T p, T m){T x = 1;while(p){if(p&1)x=(x*b)%m;b=(b*b)%m;p=p>>1;}return x;}
+template <typename T> T invFermat(T a, T p){return mod_exp(a, p-2, p);}
+template <typename T> T exp(T b, T p){T x = 1;while(p){if(p&1)x=(x*b);b=(b*b);p=p>>1;}return x;}
 
-const int N = 50;
+const int MAXN = 1e6+10;
+int isPrime[MAXN];
 
-// TC = O(nlog(log n))
-
-vector<bool> sieve(N, 1);
-vector<int> lowest_pf(N, 0);
-vector<int> highest_pf(N, 0);
-
-void sieve_generate(){
-    sieve[0] = sieve[1] = false;
-    for (int i = 2; i < N; i++){
-        if(sieve[i] == true){
-        lowest_pf[i] = highest_pf[i] = i;
-            for(int j = 2 * i; j < N; j += i){
-                sieve[j] = false;
-                highest_pf[j] = i;
-                if(lowest_pf[j] == 0)
-                    lowest_pf[j] = i;
-            }
-        }
-    }
+void sieve(){
+	isPrime[0] = isPrime[1] = 1;
+	for(int i = 2;i*i <= 1000000; i++){
+		if(isPrime[i] == 0){
+			if(i*1LL*i <= 1000000){
+				for(int j = i*i;j <= 1000000; j += i)
+					isPrime[j] = 1;
+			}
+		}
+	}
 }
 
-void prime_factorization(int n, vector<int> &pf){
-	cout << pf.size();
-    while(n > 1) {
-        auto prime_factor = highest_pf[n];
-        while(n % prime_factor == 0){
-            n /= prime_factor;
-            pf.push_back(prime_factor);
-        }
-    }
+int cnt[MAXN];
+
+bool toBeAfraid(ll num){
+	ll dig = 0;
+	ll tmpNum = num;
+	while(num > 0){
+		if(num%10 == 0)
+			return false;
+		dig++;
+		num /= 10;
+	}
+	ll div = exp(10LL, dig-1);
+	num = tmpNum;
+	while(num > 0){
+		num %= div;
+		div /= 10;
+		if((num != 0 && isPrime[num] == 1))
+			return false;
+	}
+	return true;
 }
 
-void solve(){
-	sieve_generate();
-    // for (int i = 1; i <= 50; i++){
-    //     cout << i << " = " << sieve[i] << endl;
-    // }
-
-    int n = 70;
-    vector<int> PF;
-    prime_factorization(n, PF);
-    for(auto it : PF) 
-        cout << it << " ";
+void precal(){
+	for(int i = 2;i <= 1000000; i++){
+		cnt[i] = cnt[i-1];
+		if(isPrime[i] == 0){
+			if(toBeAfraid(i))
+				cnt[i]++;
+		}
+	}
 }
 
 int main(){
+    
 	#ifndef ONLINE_JUDGE
-	freopen("E:/CP/input.txt", "r", stdin);
-    freopen("E:/CP/output.txt", "w", stdout);
-	#endif // ONLINE_JUDGE
+    freopen("E:/CP/input.txt", "r", stdin);
+    freopen("E:/CP/input.txt", "w", stdout);
+    #endif // ONLINE_JUDGE
 
-	ios::sync_with_stdio(false);
-	cin.tie(0);
-	int tt = 1;
-	while(tt--){
-		solve();
-	}
-	cerr << "time taken : " << (float)clock()/CLOCKS_PER_SEC << " secs" << endl;
-	return 0;
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    
+    sieve();
+    precal();
+    
+    int t = 1;
+    while(t <= MAXN){
+    	cout << cnt[t] << endl;
+    	t++;
+    }
+    return 0;
 }
